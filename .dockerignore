@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log*
+Dockerfile
+.dockerignore
+docker-compose.yml
+Caddyfile
+DEPLOY.md
+.env
+.env.*
+*.log
+gcp-vertex-sa.json
+*-sa.json

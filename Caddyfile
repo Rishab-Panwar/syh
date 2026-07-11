@@ -1,0 +1,5 @@
+# SITE_ADDRESS is ":80" for plain HTTP on the VM IP, or a domain like
+# "app.example.com" for automatic HTTPS (Caddy fetches a Let's Encrypt cert).
+{$SITE_ADDRESS} {
+	reverse_proxy client:3000
+}

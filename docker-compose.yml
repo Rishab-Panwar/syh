@@ -1,0 +1,50 @@
+# Self-contained deploy: Next.js (secureyourhacks) + Caddy.
+# Ask SecureBot and Risk Agent call Vertex AI (Gemini) directly from the Next
+# server, so there is no separate backend. See DEPLOY.md.
+
+services:
+  # ---- Frontend + AI features (Next.js) ----
+  client:
+    build:
+      context: .
+    environment:
+      - NODE_ENV=production
+      # Vertex AI (Gemini) for Ask SecureBot + Risk Agent
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-vertex-sa.json
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-mlops-487010}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
+      # Phishing Drill voice agent (ElevenLabs)
+      - ELEVENLABS_AGENT_ID=${ELEVENLABS_AGENT_ID}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      # Lead capture (optional)
+      - LEAD_TO_EMAIL=${LEAD_TO_EMAIL:-care@secureyourhacks.com}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - LEAD_WEBHOOK_URL=${LEAD_WEBHOOK_URL:-}
+    volumes:
+      # Vertex service-account key, mounted at runtime (not baked into the image).
+      # On GCP you can instead attach a VM service account and drop this — see DEPLOY.md.
+      - ./gcp-vertex-sa.json:/app/gcp-vertex-sa.json:ro
+    expose:
+      - "3000"
+    restart: always
+
+  # ---- Reverse proxy: Caddy (HTTP on :80, or auto-HTTPS with a domain) ----
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      - SITE_ADDRESS=${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - client
+    restart: always
+
+volumes:
+  caddy_data:
+  caddy_config:
