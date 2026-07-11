@@ -28,16 +28,24 @@ sudo usermod -aG docker $USER
 # log out and back in so the group change applies
 ```
 
-## 3. Copy the project to the VM
+## 3. Get the project onto the VM
 
-Only this one folder is needed (no DocMind):
+Clone the repo on the VM:
 
 ```bash
-gcloud compute scp --recurse "C:/Users/ankit/OneDrive/Desktop/tasks/secureyourhacks" VM_NAME:~/ --zone=ZONE
+git clone https://github.com/Rishab-Panwar/syh.git
+cd syh
 ```
 
-> Make sure `gcp-vertex-sa.json` came along (it's git-ignored but `scp --recurse`
-> copies it). Without it the AI features can't authenticate to Vertex.
+The service-account key is **not** in git (it's a secret), so copy it separately
+from your laptop:
+
+```bash
+# from your laptop
+gcloud compute scp "C:/Users/ankit/OneDrive/Desktop/tasks/secureyourhacks/gcp-vertex-sa.json" VM_NAME:~/syh/ --zone=ZONE
+```
+
+> Or, better, skip the key entirely and attach a VM service account (see step 6).
 
 ## 4. Configure environment
 
