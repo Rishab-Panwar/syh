@@ -23,6 +23,26 @@ function splitList(raw?: string): string[] {
     .filter(Boolean);
 }
 
+// Turn raw ElevenLabs/SDK errors into a message a visitor can act on. The most
+// common failure in the wild is a strict network (corporate firewall/VPN) or
+// another app holding the mic, which surfaces as a "connection closed" error.
+function friendlyError(raw: string): string {
+  const s = raw.toLowerCase();
+  if (
+    s.includes("closed") ||
+    s.includes("connection") ||
+    s.includes("websocket") ||
+    s.includes("network") ||
+    s.includes("failed to")
+  ) {
+    return "Couldn't start the call. Your network or another app may be blocking the voice connection. Try a different network or device (a strict work network or VPN can block it).";
+  }
+  if (s.includes("permission") || s.includes("denied") || s.includes("notallowed")) {
+    return "Microphone access was blocked. Please allow the mic (and close other apps using it) and try again.";
+  }
+  return "Couldn't start the call. Please try again in a moment.";
+}
+
 export function useVishingCall() {
   const [callState, setCallState] = useState<CallState>("idle");
   const [connecting, setConnecting] = useState(false);
@@ -76,7 +96,7 @@ export function useVishingCall() {
       }
     },
     onError: (err: unknown) => {
-      setError(String(err));
+      setError(friendlyError(String(err)));
       setCallState("ended");
     },
   });
