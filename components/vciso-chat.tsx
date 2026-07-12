@@ -328,6 +328,27 @@ export default function VcisoChat() {
     }
   };
 
+  // "Want to hire us?" is a fixed intent, not a question — respond deterministically
+  // with the get-started message + lead form (no LLM, so it never goes off-script).
+  const sendHire = () => {
+    if (loading) return;
+    setMessages((prev) => [
+      ...prev,
+      { id: uid(), role: "user", content: "Want to hire us?" },
+      {
+        id: uid(),
+        role: "assistant",
+        content:
+          'That\'s great to hear! To get started, you can initiate a conversation through the "Talk to an Expert" button or our Contact page. A typical engagement begins with a short discovery call to understand your specific needs, followed by a tailored proposal.',
+        meta: {
+          citations: ["How to Get Started and Contact"],
+          services: [],
+          captureLead: true,
+        },
+      },
+    ]);
+  };
+
   const empty = messages.length === 0;
 
   return (
@@ -377,7 +398,7 @@ export default function VcisoChat() {
               </div>
               <div className="mt-2.5 flex justify-center">
                 <button
-                  onClick={() => send("Want to hire us?")}
+                  onClick={sendHire}
                   className="group inline-flex items-center gap-2 rounded-xl border border-[#0167f7]/30 bg-[#0167f7]/[0.08] px-5 py-3 text-sm font-medium text-white transition hover:border-[#0167f7]/60 hover:bg-[#0167f7]/[0.16]"
                 >
                   Want to hire us?
