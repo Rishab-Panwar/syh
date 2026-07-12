@@ -45,6 +45,19 @@ function serviceHref(slug: string) {
   return `/services/${slug}`;
 }
 
+// crypto.randomUUID only exists in secure contexts (HTTPS/localhost); over plain
+// HTTP it's undefined, so use a fallback so message IDs never throw.
+function uid(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    try {
+      return crypto.randomUUID();
+    } catch {
+      /* fall through */
+    }
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // ---- Tiny, safe Markdown-ish renderer (bold + bullets + paragraphs) --------
 function renderInline(text: string, keyBase: string) {
   // Split on **bold** while keeping the delimiters' content.
@@ -262,7 +275,7 @@ export default function VcisoChat() {
     if (!question || loading) return;
 
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
-    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: "user", content: question };
+    const userMsg: ChatMessage = { id: uid(), role: "user", content: question };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
@@ -279,7 +292,7 @@ export default function VcisoChat() {
         setMessages((prev) => [
           ...prev,
           {
-            id: crypto.randomUUID(),
+            id: uid(),
             role: "assistant",
             content: data?.error ?? "Sorry, something went wrong.",
             error: true,
@@ -289,7 +302,7 @@ export default function VcisoChat() {
         setMessages((prev) => [
           ...prev,
           {
-            id: crypto.randomUUID(),
+            id: uid(),
             role: "assistant",
             content: data.answer ?? "",
             meta: {
@@ -304,7 +317,7 @@ export default function VcisoChat() {
       setMessages((prev) => [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: uid(),
           role: "assistant",
           content: "I couldn't reach the advisor. Please try again in a moment.",
           error: true,
