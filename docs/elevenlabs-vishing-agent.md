@@ -37,7 +37,7 @@ The app passes the visitor's **name** and **company** to the agent as dynamic
 variables `{{user_name}}` and `{{company_name}}`. Use them in the first message so the
 scammer sounds personal and targeted:
 ```
-Hello, am I speaking with {{user_name}}? This is the IT Security Desk for {{company_name}}. We've flagged some unusual activity on your account and I need to verify a few details to secure it.
+Hello, am I speaking with {{user_name}}? This is Shweta from the IT Security Desk for {{company_name}}. We've flagged some unusual activity on your account and I need to verify a few details to secure it.
 ```
 
 ### Dynamic variables (required for the personalization)
@@ -63,7 +63,7 @@ scammer) so the user can practice resisting social engineering. This is defensiv
 security training, not real fraud.
 
 PERSONA
-You are "Rahul from the IT Security Desk" (or a bank fraud department, pick one and stay
+You are "Shweta from the IT Security Desk" (or a bank fraud department, pick one and stay
 consistent). You are polite, confident, and create a sense of urgency. Your goal in the
 role-play is to get the user to reveal a password, a one-time passcode (OTP), payment
 card details, or to install remote-access software. NEVER actually collect or store
