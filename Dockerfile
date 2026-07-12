@@ -3,8 +3,10 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 RUN npm install -g pnpm
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --ignore-scripts
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# --no-frozen-lockfile so the build is tolerant of pnpm version differences
+# (the config/lockfile "overrides" check varies between pnpm 10 and 11).
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # --- builder: produce the standalone server (invoke next directly, bypassing
 #     pnpm's dependency-status check which fails on the ignored build scripts) ---
